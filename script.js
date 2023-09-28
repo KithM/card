@@ -27,29 +27,42 @@ function dealCards() {
     return deck;
 }
 
-const playerDeck = dealCards();
-const computerDeck = dealCards();
-
-shuffle(playerDeck);
-shuffle(computerDeck);
+var playerDeck = dealCards();
+var computerDeck = dealCards();
 
 // The arena where cards will battle
 const arena = [];
 
 // Computer's turn
 function computerTurn() {
-    // Implement computer logic
+    updateUI(computerDeck, 'computerDeck');
 }
 
 // Player's turn
 function playerTurn() {
-    // Implement player logic
+    updateUI(playerDeck, 'playerDeck');
+}
+
+// Function to update the UI
+function updateUI(deck, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    deck.forEach(card => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card';
+        cardElement.textContent = card.type;
+        container.appendChild(cardElement);
+    });
 }
 
 // Main game loop
 function gameLoop() {
+    shuffle(playerDeck);
+    shuffle(computerDeck);
+
     computerTurn();
     playerTurn();
+
     // Check win conditions
     // If anyone's deck is empty, they lose
     if (playerDeck.length === 0 || computerDeck.length === 0) {

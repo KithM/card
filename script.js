@@ -12,18 +12,19 @@ function shuffle(array) {
     return array;
 }
 
-function dealCards() {
+function dealCards(owner) {
     let deck = [];
     for (let i = 0; i < 10; i++) {
         const randomCardIndex = Math.floor(Math.random() * cards.length);
         const randomCard = cards[randomCardIndex];
-        deck.push({...randomCard}); // Use spread operator to copy object values
+        const cardWithOwner = {...randomCard, owner}; // Add owner property
+        deck.push(cardWithOwner);
     }
     return deck;
 }
 
-var playerDeck = dealCards();
-var computerDeck = dealCards();
+var playerDeck = dealCards('player');
+var computerDeck = dealCards('computer');
 
 // The arena where cards will battle
 const arena = [];
@@ -100,6 +101,56 @@ function updateUI(deck, containerId) {
     });
 }
 
+// Function to resolve battles in the arena
+function resolveArena() {
+    // First, sort the cards by speed
+    arena.sort((a, b) => {
+        // If speed is not defined, assume it's zero
+        const speedA = a.speed || 0;
+        const speedB = b.speed || 0;
+
+        return speedB - speedA; // Sort in descending order
+    });
+
+    // Now iterate through each card and perform its action
+    arena.forEach(card => {
+        // If the card has both damage and healing attributes, choose one randomly for this turn
+        let action = null;
+        if (card.damage && card.healing) {
+            action = Math.random() < 0.5 ? 'damage' : 'healing';
+        } else if (card.damage) {
+            action = 'damage';
+        } else if (card.healing) {
+            action = 'healing';
+        }
+
+        // Apply the chosen action
+        if (action === 'damage') {
+            // Choose a random enemy card to damage
+            const enemyCards = arena.filter(enemyCard => enemyCard.owner !== card.owner);
+            if (enemyCards.length > 0) {
+                const randomEnemy = enemyCards[Math.floor(Math.random() * enemyCards.length)];
+                randomEnemy.health -= card.damage;
+            }
+        } else if (action === 'healing') {
+            // Choose a random friendly card to heal (or heal self)
+            const friendlyCards = arena.filter(friendlyCard => friendlyCard.owner === card.owner);
+            const randomFriendly = friendlyCards[Math.floor(Math.random() * friendlyCards.length)];
+            randomFriendly.health += card.healing;
+        }
+    });
+
+    // Remove any cards from the arena with zero or negative health
+    for (let i = arena.length - 1; i >= 0; i--) {
+        if (arena[i].health <= 0) {
+            arena.splice(i, 1);
+        }
+    }
+
+    // Finally, update the UI to reflect the new state
+    updateUI(arena, 'arena');
+}
+
 // Main game loop
 function gameLoop() {
     shuffle(playerDeck);
@@ -107,6 +158,7 @@ function gameLoop() {
 
     computerTurn();
     playerTurn();
+    resolveArena();
 
     // Check win conditions
     // If anyone's deck is empty, they lose

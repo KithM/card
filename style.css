@@ -22,29 +22,24 @@ html {
     /* Your card styling here */
     display: inline-block;
     border-radius: 6px;
-    margin: 6px;
-    padding: 10px;
-    width: 150px;
-    height: 200px;
     text-align: center;
-    
-    color: black;
-    background-color: #fff;
 
-}
-
-.card {
     position: relative;
     border: 1px solid black;
     width: 100px;
     height: 140px;
     margin: 10px;
-    /* Your card styling here */
+    
+    color: black;
+    background-color: #fff;
 }
 
 .type {
     text-align: center;
     margin-top: 10px;
+
+    overflow: hidden;
+    height: 40px;
 }
 
 .health {

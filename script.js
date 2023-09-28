@@ -54,12 +54,26 @@ const arena = [];
 
 // Computer's turn
 function computerTurn() {
+    // Randomly select a card and move it to the arena
+    const randomIndex = Math.floor(Math.random() * computerDeck.length);
+    const selectedCard = computerDeck.splice(randomIndex, 1)[0];
+    arena.push(selectedCard);
     updateUI(computerDeck, 'computerDeck');
+    updateUI(arena, 'arena');
 }
 
 // Player's turn
 function playerTurn() {
     updateUI(playerDeck, 'playerDeck');
+    const playerCards = document.querySelectorAll('#playerDeck .card');
+    playerCards.forEach((cardElement, index) => {
+        cardElement.addEventListener('click', function() {
+            const selectedCard = playerDeck.splice(index, 1)[0];
+            arena.push(selectedCard);
+            updateUI(playerDeck, 'playerDeck');
+            updateUI(arena, 'arena');
+        });
+    });
 }
 
 // Function to update the UI

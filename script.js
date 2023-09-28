@@ -30,47 +30,40 @@ var computerDeck = dealCards('computer');
 const arena = [];
 
 // Computer's turn
-function computerTurn() {
-    // Randomly select a card and move it to the arena
+async function computerTurn() {
+    messageBox.textContent = "Computer's turn...";
+    await sleep(1000); // Wait a second to let the player see the message
+    
     const randomIndex = Math.floor(Math.random() * computerDeck.length);
     const selectedCard = computerDeck.splice(randomIndex, 1)[0];
     
     arena.push(selectedCard);
     updateUI(computerDeck, 'computerDeck');
+    animateCard(selectedCard, 'computer'); // Animate the card
     updateUI(arena, 'arena');
 }
 
-// Player's turn
-// function playerTurn() {
-//     updateUI(playerDeck, 'playerDeck');
-    
-//     const playerCards = document.querySelectorAll('#playerDeck .card');
-//     playerCards.forEach((cardElement, index) => {
-//         cardElement.addEventListener('click', function() {
-//             const selectedCard = playerDeck.splice(index, 1)[0];
-            
-//             arena.push(selectedCard);
-//             updateUI(playerDeck, 'playerDeck');
-//             updateUI(arena, 'arena');
-//         });
-//     });
-// }
-function waitForPlayerTurn() {
+// Player Turn
+async function playerTurn() {
     return new Promise(resolve => {
-      updateUI(playerDeck, 'playerDeck');
+        messageBox.textContent = "Your turn!";
+        updateUI(playerDeck, 'playerDeck');
   
-      const playerCards = document.querySelectorAll('#playerDeck .card');
-      playerCards.forEach((cardElement, index) => {
-        cardElement.addEventListener('click', function() {
-          const selectedCard = playerDeck.splice(index, 1)[0];
-          arena.push(selectedCard);
-          updateUI(playerDeck, 'playerDeck');
-          updateUI(arena, 'arena');
-          resolve(); // Resolve the promise, allowing the game to proceed
-        }, { once: true });
-      });
+        const playerCards = document.querySelectorAll('#playerDeck .card');
+        playerCards.forEach((cardElement, index) => {
+            cardElement.addEventListener('click', async function() {
+                const selectedCard = playerDeck.splice(index, 1)[0];
+                arena.push(selectedCard);
+                animateCard(selectedCard, 'player'); // Animate the card
+                
+                updateUI(playerDeck, 'playerDeck');
+                await sleep(1000); // Wait for animation to complete
+                updateUI(arena, 'arena');
+                resolve(); // Resolve the promise
+            }, { once: true });
+        });
     });
-  }
+}
 
 // Function to update the UI
 function updateUI(deck, containerId) {
@@ -80,6 +73,13 @@ function updateUI(deck, containerId) {
         const cardElement = document.createElement('div');
         cardElement.className = 'card';
         
+        // Set border color based on the owner of the card
+        if (card.owner === 'computer') {
+            cardElement.style.borderColor = 'red';
+        } else if (card.owner === 'player') {
+            cardElement.style.borderColor = 'green';
+        }
+
         // Displaying the type of the card
         const typeElement = document.createElement('div');
         typeElement.className = 'type';
@@ -167,27 +167,53 @@ function resolveArena() {
     updateUI(arena, 'arena');
 }
 
-// // Main game loop
-// function gameLoop() {
-//     computerTurn();
-//     playerTurn();
-//     resolveArena();
+// Function to animate a card when it moves into the arena
+function animateCard(card, owner) {
+    // Create a temporary card element to show the animation
+    const cardElement = document.createElement('div');
+    cardElement.className = 'card animating-card';
 
-//     // Check win conditions
-//     // If anyone's deck is empty, they lose
-//     if (playerDeck.length === 0 || computerDeck.length === 0) {
-//         // Declare winner and end game
-//         gameState = null;
-//         return;
+    // Position the temporary card element at the starting point
+    const startDeck = document.getElementById(`${owner}Deck`);
+    const endDeck = document.getElementById("arena");
+    const startRect = startDeck.getBoundingClientRect();
+    const endRect = endDeck.getBoundingClientRect();
+
+    cardElement.style.top = `${startRect.top}px`;
+    cardElement.style.left = `${startRect.left + startRect.width / 2}px`;
+
+    // Append the temporary card element to the body
+    document.body.appendChild(cardElement);
+
+    // Animate the temporary card to the arena
+    setTimeout(() => {
+        cardElement.style.top = `${endRect.top + endRect.height / 2}px`;
+        cardElement.style.left = `${endRect.left + endRect.width / 2}px`;
+    }, 10);
+
+    // Remove the temporary card element after the animation completes
+    setTimeout(() => {
+        cardElement.remove();
+    }, 1010);
+}
+
+// Sleep function to introduce delays
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// async function gameLoop() {
+//     while (gameState !== null) {
+//         computerTurn();
+//         await waitForPlayerTurn(); // Wait for player to make a move
+//         resolveArena();
+//         // Check win conditions
 //     }
-
-//     gameState = setTimeout(gameLoop(), 1000);
 // }
-
 async function gameLoop() {
     while (gameState !== null) {
-        computerTurn();
-        await waitForPlayerTurn(); // Wait for player to make a move
+        await computerTurn(); // Wait for computer turn to complete
+        await playerTurn(); // Wait for player turn to complete
         resolveArena();
         // Check win conditions
     }

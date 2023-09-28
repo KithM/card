@@ -28,7 +28,8 @@ html {
     border: 1px solid black;
     width: 100px;
     height: 140px;
-    margin: 10px;
+    margin: 4px;
+    padding: 10px;
     
     color: black;
     background-color: #fff;

@@ -1,4 +1,4 @@
-// cards moved to cards.js
+var gameState = null;
 
 function shuffle(array) {
     let currentIndex = array.length, randomIndex;
@@ -153,9 +153,6 @@ function resolveArena() {
 
 // Main game loop
 function gameLoop() {
-    shuffle(playerDeck);
-    shuffle(computerDeck);
-
     computerTurn();
     playerTurn();
     resolveArena();
@@ -164,8 +161,16 @@ function gameLoop() {
     // If anyone's deck is empty, they lose
     if (playerDeck.length === 0 || computerDeck.length === 0) {
         // Declare winner and end game
+        gameState = null;
+        return;
     }
+
+    gameState = setTimeout(gameLoop(), 1000);
 }
+
+// Shuffle cards
+shuffle(playerDeck);
+shuffle(computerDeck);
 
 // Start the game
 gameLoop();

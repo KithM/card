@@ -1,28 +1,4 @@
-const cards = [
-    // HUMANOID DAMAGE
-    { type: 'Bandit', health: 6, damage: 2 },
-    { type: 'Bandit Chief', health: 12, damage: 6 },
-    { type: 'Warrior', health: 10, damage: 2 },
-    { type: 'Barbarian', health: 8, damage: 4 },
-    { type: 'Guardian', health: 14, damage: 4 },
-
-    { type: 'Sorcerer', health: 4, damage: 8 },
-    { type: 'Wizard', health: 3, damage: 10 },
-    { type: 'Mage', health: 6, damage: 6 },
-
-    // BEAST DAMAGE
-    { type: 'Wolf', health: 4, damage: 6 },
-    { type: 'Dire Wolf', health: 6, damage: 8 },
-    { type: 'Black Bear', health: 8, damage: 8 },
-    { type: 'Brown Bear', health: 8, damage: 10 },
-
-    // HEALING
-    { type: 'Bard', health: 8, healing: 2, damage: 2 },
-    { type: 'Cleric', health: 8, healing: 6 },
-
-    // SPECIAL
-    { type: 'Void' }
-];
+// cards moved to cards.js
 
 function shuffle(array) {
     let currentIndex = array.length, randomIndex;
@@ -57,6 +33,7 @@ function computerTurn() {
     // Randomly select a card and move it to the arena
     const randomIndex = Math.floor(Math.random() * computerDeck.length);
     const selectedCard = computerDeck.splice(randomIndex, 1)[0];
+    
     arena.push(selectedCard);
     updateUI(computerDeck, 'computerDeck');
     updateUI(arena, 'arena');
@@ -65,10 +42,12 @@ function computerTurn() {
 // Player's turn
 function playerTurn() {
     updateUI(playerDeck, 'playerDeck');
+    
     const playerCards = document.querySelectorAll('#playerDeck .card');
     playerCards.forEach((cardElement, index) => {
         cardElement.addEventListener('click', function() {
             const selectedCard = playerDeck.splice(index, 1)[0];
+            
             arena.push(selectedCard);
             updateUI(playerDeck, 'playerDeck');
             updateUI(arena, 'arena');

@@ -41,20 +41,36 @@ function computerTurn() {
 }
 
 // Player's turn
-function playerTurn() {
-    updateUI(playerDeck, 'playerDeck');
+// function playerTurn() {
+//     updateUI(playerDeck, 'playerDeck');
     
-    const playerCards = document.querySelectorAll('#playerDeck .card');
-    playerCards.forEach((cardElement, index) => {
-        cardElement.addEventListener('click', function() {
-            const selectedCard = playerDeck.splice(index, 1)[0];
+//     const playerCards = document.querySelectorAll('#playerDeck .card');
+//     playerCards.forEach((cardElement, index) => {
+//         cardElement.addEventListener('click', function() {
+//             const selectedCard = playerDeck.splice(index, 1)[0];
             
-            arena.push(selectedCard);
-            updateUI(playerDeck, 'playerDeck');
-            updateUI(arena, 'arena');
-        });
+//             arena.push(selectedCard);
+//             updateUI(playerDeck, 'playerDeck');
+//             updateUI(arena, 'arena');
+//         });
+//     });
+// }
+function waitForPlayerTurn() {
+    return new Promise(resolve => {
+      updateUI(playerDeck, 'playerDeck');
+  
+      const playerCards = document.querySelectorAll('#playerDeck .card');
+      playerCards.forEach((cardElement, index) => {
+        cardElement.addEventListener('click', function() {
+          const selectedCard = playerDeck.splice(index, 1)[0];
+          arena.push(selectedCard);
+          updateUI(playerDeck, 'playerDeck');
+          updateUI(arena, 'arena');
+          resolve(); // Resolve the promise, allowing the game to proceed
+        }, { once: true });
+      });
     });
-}
+  }
 
 // Function to update the UI
 function updateUI(deck, containerId) {
@@ -151,26 +167,38 @@ function resolveArena() {
     updateUI(arena, 'arena');
 }
 
-// Main game loop
-function gameLoop() {
-    computerTurn();
-    playerTurn();
-    resolveArena();
+// // Main game loop
+// function gameLoop() {
+//     computerTurn();
+//     playerTurn();
+//     resolveArena();
 
-    // Check win conditions
-    // If anyone's deck is empty, they lose
-    if (playerDeck.length === 0 || computerDeck.length === 0) {
-        // Declare winner and end game
-        gameState = null;
-        return;
+//     // Check win conditions
+//     // If anyone's deck is empty, they lose
+//     if (playerDeck.length === 0 || computerDeck.length === 0) {
+//         // Declare winner and end game
+//         gameState = null;
+//         return;
+//     }
+
+//     gameState = setTimeout(gameLoop(), 1000);
+// }
+
+async function gameLoop() {
+    while (gameState !== null) {
+        computerTurn();
+        await waitForPlayerTurn(); // Wait for player to make a move
+        resolveArena();
+        // Check win conditions
     }
-
-    gameState = setTimeout(gameLoop(), 1000);
 }
 
 // Shuffle cards
 shuffle(playerDeck);
 shuffle(computerDeck);
+
+// Initialize game state
+gameState = 'ongoing';
 
 // Start the game
 gameLoop();

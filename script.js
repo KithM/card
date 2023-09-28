@@ -62,7 +62,40 @@ function updateUI(deck, containerId) {
     deck.forEach(card => {
         const cardElement = document.createElement('div');
         cardElement.className = 'card';
-        cardElement.textContent = card.type;
+        
+        // Displaying the type of the card
+        const typeElement = document.createElement('div');
+        typeElement.className = 'type';
+        typeElement.textContent = card.type;
+        cardElement.appendChild(typeElement);
+
+        // Displaying the health of the card
+        if (card.health !== undefined) {
+            const healthElement = document.createElement('div');
+            healthElement.className = 'health';
+            healthElement.textContent = card.health;
+            cardElement.appendChild(healthElement);
+        }
+
+        // Displaying the mana or energy of the card
+        if (card.mana !== undefined || card.energy !== undefined) {
+            const manaEnergyElement = document.createElement('div');
+            manaEnergyElement.className = 'mana-energy';
+            manaEnergyElement.textContent = card.mana || card.energy;
+            cardElement.appendChild(manaEnergyElement);
+        }
+
+        // Displaying the damage and healing of the card
+        if (card.damage !== undefined || card.healing !== undefined) {
+            const damageHealingElement = document.createElement('div');
+            damageHealingElement.className = 'damage-healing';
+            let textContent = '';
+            if (card.damage !== undefined) textContent += `-${card.damage}`;
+            if (card.healing !== undefined) textContent += (textContent ? '/' : '') + `+${card.healing}`;
+            damageHealingElement.textContent = textContent;
+            cardElement.appendChild(damageHealingElement);
+        }
+
         container.appendChild(cardElement);
     });
 }

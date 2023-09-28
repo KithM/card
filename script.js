@@ -33,13 +33,16 @@ const arena = [];
 async function computerTurn() {
     messageBox.textContent = "Computer's turn...";
     await sleep(1000); // Wait a second to let the player see the message
-    
+
+    // Randomly select a card and move it to the arena
     const randomIndex = Math.floor(Math.random() * computerDeck.length);
     const selectedCard = computerDeck.splice(randomIndex, 1)[0];
     
+    const arenaIndex = arena.length;  // The position the card will take in the arena
+    animateCard('computer', randomIndex, arenaIndex);  // Pass the start and end positions
+    
     arena.push(selectedCard);
     updateUI(computerDeck, 'computerDeck');
-    animateCard(selectedCard, 'computer'); // Animate the card
     updateUI(arena, 'arena');
 }
 
@@ -53,11 +56,14 @@ async function playerTurn() {
         playerCards.forEach((cardElement, index) => {
             cardElement.addEventListener('click', async function() {
                 const selectedCard = playerDeck.splice(index, 1)[0];
-                arena.push(selectedCard);
-                animateCard(selectedCard, 'player'); // Animate the card
                 
+                const arenaIndex = arena.length;
+                animateCard('player', index, arenaIndex);
+                
+                arena.push(selectedCard);
                 updateUI(playerDeck, 'playerDeck');
                 await sleep(1000); // Wait for animation to complete
+                
                 updateUI(arena, 'arena');
                 resolve(); // Resolve the promise
             }, { once: true });
@@ -167,28 +173,31 @@ function resolveArena() {
     updateUI(arena, 'arena');
 }
 
-// Function to animate a card when it moves into the arena
-function animateCard(card, owner) {
+function animateCard(owner, startPositionIndex, endPositionIndex) {
     // Create a temporary card element to show the animation
     const cardElement = document.createElement('div');
     cardElement.className = 'card animating-card';
 
-    // Position the temporary card element at the starting point
+    // Calculate the start and end positions based on the card index in the respective decks
     const startDeck = document.getElementById(`${owner}Deck`);
     const endDeck = document.getElementById("arena");
     const startRect = startDeck.getBoundingClientRect();
     const endRect = endDeck.getBoundingClientRect();
 
+    const cardWidth = 100;  // Width of a card including its margin (adjust based on your actual value)
+    const cardStartX = startRect.left + startPositionIndex * cardWidth;
+    const cardEndX = endRect.left + endPositionIndex * cardWidth;
+
     cardElement.style.top = `${startRect.top}px`;
-    cardElement.style.left = `${startRect.left + startRect.width / 2}px`;
+    cardElement.style.left = `${cardStartX}px`;
 
     // Append the temporary card element to the body
     document.body.appendChild(cardElement);
 
     // Animate the temporary card to the arena
     setTimeout(() => {
-        cardElement.style.top = `${endRect.top + endRect.height / 2}px`;
-        cardElement.style.left = `${endRect.left + endRect.width / 2}px`;
+        cardElement.style.top = `${endRect.top}px`;
+        cardElement.style.left = `${cardEndX}px`;
     }, 10);
 
     // Remove the temporary card element after the animation completes

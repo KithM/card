@@ -32,3 +32,35 @@ html {
     background-color: #fff;
 
 }
+
+.card {
+    position: relative;
+    border: 1px solid black;
+    width: 100px;
+    height: 140px;
+    margin: 10px;
+    /* Your card styling here */
+}
+
+.type {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.health {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+.mana-energy {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+}
+
+.damage-healing {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}

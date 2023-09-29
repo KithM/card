@@ -14,6 +14,10 @@ const cards = [
     { type: 'Ranger',       health: 5, damage: 8, speed: 7 },
     { type: 'Marksman',     health: 4, damage: 10, speed: 8 },
 
+    { type: 'Rogue',        health: 4, damage: 6, speed: 6 },
+    { type: 'Cutpurse',     health: 6, damage: 4, speed: 7 },
+    { type: 'Assassin',     health: 8, damage: 6, speed: 8 },
+
     // BEAST DAMAGE
     { type: 'Wolf',         health: 4, damage: 6, speed: 4 },
     { type: 'Dire Wolf',    health: 6, damage: 8, speed: 4 },
@@ -40,7 +44,6 @@ const cards = [
     // MECHANICAL DAMAGE
     { type: 'Goblin Tinkerer', health: 4, damage: 6, speed: 4 },
     { type: 'Steam Golem',     health: 8, damage: 6, speed: 2 },
-    { type: 'Battle Mech',     health: 10, damage: 8, speed: 3 },
 
     // DRAGONKIN DAMAGE
     { type: 'Wyrm',            health: 6, damage: 6, speed: 5 },
@@ -52,11 +55,13 @@ const cards = [
     { type: 'Archangel',       health: 10, damage: 6, healing: 6, speed: 4 },
 
     // HEALING
-    { type: 'Druid',        health: 6, healing: 2, damage: 3, speed: 4 },
-    { type: 'Bard',         health: 6, healing: 3, damage: 2, speed: 2 },
-    { type: 'Cleric',       health: 4, healing: 6, speed: 1 },
-    { type: 'Priest',       health: 3, healing: 8, speed: 1 },
+    { type: 'Druid',            health: 6, healing: 2, damage: 3, speed: 4 },
+    { type: 'Bard',             health: 6, healing: 3, damage: 2, speed: 2 },
+    { type: 'Cleric',           health: 4, healing: 6, speed: 1 },
+    { type: 'Priest',           health: 3, healing: 8, speed: 1 },
 
     // SPECIAL
-    { type: 'Void',         speed: 0 }
+    { type: 'Void',             health: 20, speed: 0 } // Destroys all cards in arena
+    //{ type: 'Chronomancer',     health: 4, speed: 7 }, // Halves the speed of all other cards in the arena for one turn
+    //{ type: 'Alchemist',        health: 5, speed: 3 } // Transforms any card in the arena into a random new card
 ];

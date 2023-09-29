@@ -1,3 +1,4 @@
+const cardsDealt = 10;
 var gameState = null;
 
 function shuffle(array) {
@@ -14,7 +15,7 @@ function shuffle(array) {
 
 function dealCards(owner) {
     let deck = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < cardsDealt; i++) {
         const randomCardIndex = Math.floor(Math.random() * cards.length);
         const randomCard = cards[randomCardIndex];
         const cardWithOwner = {...randomCard, owner}; // Add owner property
@@ -32,42 +33,54 @@ const arena = [];
 // Computer's turn
 async function computerTurn() {
     messageBox.textContent = "Computer's turn...";
-    await sleep(1000); // Wait a second to let the player see the message
+    await sleep(1000);
 
-    // Randomly select a card and move it to the arena
-    const randomIndex = Math.floor(Math.random() * computerDeck.length);
-    const selectedCard = computerDeck.splice(randomIndex, 1)[0];
-    
-    const arenaIndex = arena.length;  // The position the card will take in the arena
-    animateCard('computer', randomIndex, arenaIndex);  // Pass the start and end positions
-    
-    arena.push(selectedCard);
-    updateUI(computerDeck, 'computerDeck');
+    // Check if the computer already has 2 cards in the arena
+    const computerCardsInArena = arena.filter(card => card.owner === 'computer');
+    if (computerCardsInArena.length < 2) {
+        const randomIndex = Math.floor(Math.random() * computerDeck.length);
+        const selectedCard = computerDeck.splice(randomIndex, 1)[0];
+        const arenaIndex = arena.length;
+        animateCard('computer', randomIndex, arenaIndex);
+        arena.push(selectedCard);
+        updateUI(computerDeck, 'computerDeck');
+    }
+
     updateUI(arena, 'arena');
 }
 
-// Player Turn
+// Player turn
 async function playerTurn() {
     return new Promise(resolve => {
         messageBox.textContent = "Your turn!";
         updateUI(playerDeck, 'playerDeck');
-  
-        const playerCards = document.querySelectorAll('#playerDeck .card');
-        playerCards.forEach((cardElement, index) => {
-            cardElement.addEventListener('click', async function() {
-                const selectedCard = playerDeck.splice(index, 1)[0];
-                
-                const arenaIndex = arena.length;
-                animateCard('player', index, arenaIndex);
-                
-                arena.push(selectedCard);
-                updateUI(playerDeck, 'playerDeck');
-                await sleep(1000); // Wait for animation to complete
-                
-                updateUI(arena, 'arena');
-                resolve(); // Resolve the promise
-            }, { once: true });
-        });
+
+        const skipTurnButton = document.getElementById('skipTurnButton');
+        skipTurnButton.addEventListener('click', function() {
+            resolve(); // Resolve the promise immediately
+        }, { once: true });
+
+        const playerCardsInArena = arena.filter(card => card.owner === 'player');
+        if (playerCardsInArena.length < 2) {
+            const playerCards = document.querySelectorAll('#playerDeck .card');
+            playerCards.forEach((cardElement, index) => {
+                cardElement.addEventListener('click', async function() {
+                    const selectedCard = playerDeck.splice(index, 1)[0];
+                    
+                    const arenaIndex = arena.length;                    
+                    animateCard('player', index, arenaIndex);
+
+                    arena.push(selectedCard);                    
+                    updateUI(playerDeck, 'playerDeck');
+                    await sleep(1000);    
+
+                    updateUI(arena, 'arena');
+                    resolve();
+                }, { once: true });
+            });
+        } else {
+            resolve(); // If player already has 2 cards in arena, resolve immediately
+        }
     });
 }
 
@@ -134,6 +147,9 @@ function resolveArena() {
         return speedB - speedA; // Sort in descending order
     });
 
+    // Create a flag to track if the Void card is in play
+    let isVoidInPlay = false;
+
     // Now iterate through each card and perform its action
     arena.forEach(card => {
         // If the card has both damage and healing attributes, choose one randomly for this turn
@@ -144,6 +160,12 @@ function resolveArena() {
             action = 'damage';
         } else if (card.healing) {
             action = 'healing';
+        }
+        
+        // Special
+        if(card.type === 'Void'){
+            // Set the flag for the Void card
+            isVoidInPlay = true;
         }
 
         // Apply the chosen action
@@ -163,8 +185,9 @@ function resolveArena() {
     });
 
     // Remove any cards from the arena with zero or negative health
+    // Also remove cards if Void card was in play
     for (let i = arena.length - 1; i >= 0; i--) {
-        if (arena[i].health <= 0) {
+        if (arena[i].health <= 0 || isVoidInPlay) {
             arena.splice(i, 1);
         }
     }
@@ -211,14 +234,6 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// async function gameLoop() {
-//     while (gameState !== null) {
-//         computerTurn();
-//         await waitForPlayerTurn(); // Wait for player to make a move
-//         resolveArena();
-//         // Check win conditions
-//     }
-// }
 async function gameLoop() {
     while (gameState !== null) {
         await computerTurn(); // Wait for computer turn to complete

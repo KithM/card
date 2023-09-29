@@ -92,49 +92,50 @@ function updateUI(deck, containerId) {
         const cardElement = document.createElement('div');
         cardElement.className = 'card';
         
-        // Hide computer cards that are not in the arena
-        if (card.owner === 'computer' && containerId === 'computerDeck') {
-            cardElement.className += ' hidden-card';
-        } else {
-            // Set border color based on the owner of the card
-            if (card.owner === 'computer') {
-                cardElement.style.borderColor = 'red';
-            } else if (card.owner === 'player') {
-                cardElement.style.borderColor = 'green';
+        // Set border color based on the owner of the card
+        if (card.owner === 'computer') {
+            cardElement.style.borderColor = 'red';
+            
+            if (containerId !== 'arena') {
+                // Skip the rest of the details for computer cards not in the arena
+                container.appendChild(cardElement);
+                return;
             }
+        } else if (card.owner === 'player') {
+            cardElement.style.borderColor = 'green';
+        }
 
-            // Displaying the type of the card
-            const typeElement = document.createElement('div');
-            typeElement.className = 'type';
-            typeElement.textContent = card.type;
-            cardElement.appendChild(typeElement);
+        // Displaying the type of the card
+        const typeElement = document.createElement('div');
+        typeElement.className = 'type';
+        typeElement.textContent = card.type;
+        cardElement.appendChild(typeElement);
 
-            // Displaying the health of the card
-            if (card.health !== undefined) {
-                const healthElement = document.createElement('div');
-                healthElement.className = 'health';
-                healthElement.textContent = card.health;
-                cardElement.appendChild(healthElement);
-            }
+        // Displaying the health of the card
+        if (card.health !== undefined) {
+            const healthElement = document.createElement('div');
+            healthElement.className = 'health';
+            healthElement.textContent = card.health;
+            cardElement.appendChild(healthElement);
+        }
 
-            // Displaying the mana or energy of the card
-            if (card.mana !== undefined || card.energy !== undefined) {
-                const manaEnergyElement = document.createElement('div');
-                manaEnergyElement.className = 'mana-energy';
-                manaEnergyElement.textContent = card.mana || card.energy;
-                cardElement.appendChild(manaEnergyElement);
-            }
+        // Displaying the mana or energy of the card
+        if (card.mana !== undefined || card.energy !== undefined) {
+            const manaEnergyElement = document.createElement('div');
+            manaEnergyElement.className = 'mana-energy';
+            manaEnergyElement.textContent = card.mana || card.energy;
+            cardElement.appendChild(manaEnergyElement);
+        }
 
-            // Displaying the damage and healing of the card
-            if (card.damage !== undefined || card.healing !== undefined) {
-                const damageHealingElement = document.createElement('div');
-                damageHealingElement.className = 'damage-healing';
-                let textContent = '';
-                if (card.damage !== undefined) textContent += `-${card.damage}`;
-                if (card.healing !== undefined) textContent += (textContent ? '/' : '') + `+${card.healing}`;
-                damageHealingElement.textContent = textContent;
-                cardElement.appendChild(damageHealingElement);
-            }
+        // Displaying the damage and healing of the card
+        if (card.damage !== undefined || card.healing !== undefined) {
+            const damageHealingElement = document.createElement('div');
+            damageHealingElement.className = 'damage-healing';
+            let textContent = '';
+            if (card.damage !== undefined) textContent += `-${card.damage}`;
+            if (card.healing !== undefined) textContent += (textContent ? '/' : '') + `+${card.healing}`;
+            damageHealingElement.textContent = textContent;
+            cardElement.appendChild(damageHealingElement);
         }
 
         container.appendChild(cardElement);
